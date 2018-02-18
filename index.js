@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));
 	// serves main.js/main.css
 
-	const path = requiew('path');
+	const path = require('path');
 	app.get('*', (req, res) => {
 		res.sendFile(path.resolce(__dirname, 'client', 'build', 'index.html'));
 	});
