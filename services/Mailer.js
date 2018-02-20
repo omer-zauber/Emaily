@@ -1,32 +1,34 @@
-const sendgrid = require("sendgrid");
-const { mail: helper } = sendgrid;
-const keys = require("../config/keys");
+const sendgrid = require('sendgrid');
+const helper = sendgrid.mail;
+const keys = require('../config/keys');
 
 class Mailer extends helper.Mail {
   constructor({ subject, recipients }, content) {
     super();
 
     this.sgApi = sendgrid(keys.sendGridKey);
-    this.from_email = new helper.Email("no-reply@emaily.com");
+    this.from_email = new helper.Email('no-reply@emaily.com');
     this.subject = subject;
-    this.body = new helper.Content("text/html", content);
-    this.recipients = this.formatAdresses(recipients);
+    this.body = new helper.Content('text/html', content);
+    this.recipients = this.formatAddresses(recipients);
 
     this.addContent(this.body);
     this.addClickTracking();
     this.addRecipients();
   }
 
-  formatAdresses(recipients) {
-    return recipients.map(({ email }) => new helper.Email(email));
+  formatAddresses(recipients) {
+    return recipients.map(({ email }) => {
+      return new helper.Email(email);
+    });
   }
 
   addClickTracking() {
-    const trackingSetting = new helper.TrackingSettings();
-    const clickTracking = new helper.clickTracking(true, true);
+    const trackingSettings = new helper.TrackingSettings();
+    const clickTracking = new helper.ClickTracking(true, true);
 
-    TrackingSettings.setClickTracking(clickTracking);
-    this.addTrackingSettings(trackingSetting);
+    trackingSettings.setClickTracking(clickTracking);
+    this.addTrackingSettings(trackingSettings);
   }
 
   addRecipients() {
@@ -40,12 +42,12 @@ class Mailer extends helper.Mail {
 
   async send() {
     const request = this.sgApi.emptyRequest({
-      method: "POST",
-      path: "/v3/mail/send",
+      method: 'POST',
+      path: '/v3/mail/send',
       body: this.toJSON()
     });
 
-    const response = this.sgApi.API(request);
+    const response = await this.sgApi.API(request);
     return response;
   }
 }
